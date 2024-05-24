@@ -1,16 +1,47 @@
 import { useEffect, useState } from "react";
 import MetamaskButton from "./components/MetamaskButton";
+import Erc20Connect from "./components/Erc20Connect";
 
 const App = () => {
   const [signer, setSigner] = useState();
+  const [contract, setContract] = useState();
+  const [name, setName] = useState();
+  const [symbol, setSymbol] = useState();
+
+  const getNameSymbol = async () => {
+    try {
+      const nameResponse = await contract.name();
+      const symbolResponse = await contract.symbol();
+
+      setName(nameResponse);
+      setSymbol(symbolResponse);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
-    console.log(signer);
-  }, [signer]);
+    if (!contract) return;
+
+    getNameSymbol();
+  }, [contract]);
 
   return (
     <div className="min-h-screen flex flex-col justify-start items-center py-16">
       <MetamaskButton signer={signer} setSigner={setSigner} />
+      {signer && (
+        <div className="mt-16 flex flex-col gap-8 grow max-w-xl w-full">
+          <div className="box-style text-center">
+            0x3521b39b39CE93cC3ef47c4636a8CC861C206782
+          </div>
+          <Erc20Connect
+            name={name}
+            symbol={symbol}
+            signer={signer}
+            setContract={setContract}
+          />
+        </div>
+      )}
     </div>
   );
 };
